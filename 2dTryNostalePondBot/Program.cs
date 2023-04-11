@@ -3,6 +3,11 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using AForge.Imaging;
+using AForge.Imaging.Filters;
 
 class Program
 {
@@ -56,12 +61,19 @@ class Program
             Console.WriteLine("Width: " + windowWidth);
             Console.WriteLine("Height: " + windowHeight);
 
+            List<Object> obj = new List<Object>();
+            obj.Add(hwnd);
+            obj.Add(rect);
+            Thread thread = new Thread(ThreadMethod);
+            thread.Start(obj);
+
             while (true)
             {
                 Pond(rect, 349, 370, 421, 431, "../../../leftPond.png", hwnd, "left");
                 Pond(rect, 456, 429, 537, 490, "../../../downPond.png", hwnd, "down");
                 Pond(rect, 488, 323, 577, 382, "../../../upPond.png", hwnd, "up");
                 Pond(rect, 604, 378, 709, 434, "../../../rightPond.png", hwnd, "right");
+
                 //GetMousePosition(rect);
                 Thread.Sleep(50);
             }
@@ -134,6 +146,80 @@ class Program
             }
         }
     }
+
+    static void Bonus(RECT rect, int left, int top, int width, int height, string reference, IntPtr hwnd, string direction)
+    {
+        int captureX = rect.Left + left; // X coordinate of the capture region
+        int captureY = rect.Top + top; // Y coordinate of the capture region
+        int captureWidth = width - left; // Width of the capture region
+        int captureHeight = height - top; // Height of the capture region
+
+        Bitmap imageReference = new Bitmap(reference);
+
+        TemplateMatch[] matches;
+
+        using (Bitmap bitmap = new Bitmap(captureWidth, captureHeight, PixelFormat.Format32bppArgb))
+        {
+            using (Graphics graphics = Graphics.FromImage(bitmap))
+            {
+                graphics.CopyFromScreen(captureX, captureY, 0, 0, new Size(captureWidth, captureHeight), CopyPixelOperation.SourceCopy);
+            }
+            /*string fileName = "screenshot.png"; // File name of the screenshot
+            bitmap.Save(fileName, ImageFormat.Png);
+            Console.WriteLine("Screenshot saved as: " + fileName);*/
+
+            // Convert the images to grayscale
+            Grayscale grayFilter = new Grayscale(0.2125, 0.7154, 0.0721);
+            Bitmap grayLarge = grayFilter.Apply(bitmap);
+            Bitmap graySmall = grayFilter.Apply(imageReference);
+
+            // Instantiate the template matching class
+            ExhaustiveTemplateMatching templateMatching = new ExhaustiveTemplateMatching(0.9f);
+
+            // Find the smaller image within the larger image
+            matches = templateMatching.ProcessImage(grayLarge, graySmall);
+
+
+            if (matches.Length > 0)
+            {
+                Console.WriteLine("Bonus");
+                switch (direction)
+                {
+                    case "left":
+                        SendMessage(hwnd, WM_KEYDOWN, (IntPtr)0x25, IntPtr.Zero);
+                        SendMessage(hwnd, WM_KEYUP, (IntPtr)0x25, IntPtr.Zero);
+                        break;
+                    case "down":
+                        SendMessage(hwnd, WM_KEYDOWN, (IntPtr)0x28, IntPtr.Zero);
+                        SendMessage(hwnd, WM_KEYUP, (IntPtr)0x28, IntPtr.Zero);
+                        break;
+                    case "up":
+                        SendMessage(hwnd, WM_KEYDOWN, (IntPtr)0x26, IntPtr.Zero);
+                        SendMessage(hwnd, WM_KEYUP, (IntPtr)0x26, IntPtr.Zero);
+                        break;
+                    case "right":
+                        SendMessage(hwnd, WM_KEYDOWN, (IntPtr)0x27, IntPtr.Zero);
+                        SendMessage(hwnd, WM_KEYUP, (IntPtr)0x27, IntPtr.Zero);
+                        break;
+                }
+            }
+        }
+    }
+
+    static void ThreadMethod(Object obj)
+    {
+        List<Object> objects = (List<Object>)obj;
+        RECT rect = (RECT)objects[1];
+        IntPtr hwnd = (IntPtr)objects[0];
+        while (true)
+        {
+            Bonus(rect, 327, 374, 759, 462, "../../../leftBonus.png", hwnd, "left");
+            Bonus(rect, 327, 374, 759, 462, "../../../downBonus.png", hwnd, "down");
+            Bonus(rect, 327, 374, 759, 462, "../../../upBonus.png", hwnd, "up");
+            Bonus(rect, 327, 374, 759, 462, "../../../rightBonus.png", hwnd, "right");
+            Thread.Sleep(50);
+        }
+    }
     static void GetMousePosition(RECT rect)
     {
         POINT mousePosition;
@@ -144,6 +230,7 @@ class Program
             Console.WriteLine("Y: " + (mousePosition.Y - rect.Top));
         }
     }
+    
 }
 
 
