@@ -58,11 +58,11 @@ class Program
 
             while (true)
             {
-                Pond(rect, 349, 370, 421, 431, "leftPond.png", hwnd, "left");
-                Pond(rect, 456, 429, 537, 490, "downPond.png", hwnd, "down");
-                Pond(rect, 488, 323, 577, 382, "upPond.png", hwnd, "up");
-                Pond(rect, 604, 378, 709, 434, "rightPond.png", hwnd, "right");
-                GetMousePosition(rect);
+                Pond(rect, 349, 370, 421, 431, "../../../leftPond.png", hwnd, "left");
+                Pond(rect, 456, 429, 537, 490, "../../../downPond.png", hwnd, "down");
+                Pond(rect, 488, 323, 577, 382, "../../../upPond.png", hwnd, "up");
+                Pond(rect, 604, 378, 709, 434, "../../../rightPond.png", hwnd, "right");
+                //GetMousePosition(rect);
                 Thread.Sleep(50);
             }
         }
