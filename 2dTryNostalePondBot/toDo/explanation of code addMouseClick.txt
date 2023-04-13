@@ -1,0 +1,5 @@
+In the code snippet provided, (y << 16) is used to shift the value of y 16 bits to the left, effectively multiplying it by 65536 (2^16). This is done to create a single lParam value that combines both the x-coordinate and y-coordinate into a single integer value that can be used as a parameter in the SendMessage function.
+
+In Windows API, lParam is a 32-bit value that typically contains two 16-bit values packed into a single integer, where the low word (16 least significant bits) contains the x-coordinate and the high word (16 most significant bits) contains the y-coordinate.
+
+By shifting y 16 bits to the left, its value is effectively multiplied by 65536, which allows it to be combined with the x-coordinate in the lParam value. This combined lParam value can then be used as a parameter in the SendMessage function to specify the desired x and y coordinates for simulating the mouse click.

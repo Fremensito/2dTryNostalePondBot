@@ -1,0 +1,7 @@
+Mouse Position: X: 445 Y: 213
+Mouse Position: X: 462 Y: 235
+
+641, 464 Reward
+646, 464 Lv 5
+452, 491 play again
+518, 576 start
