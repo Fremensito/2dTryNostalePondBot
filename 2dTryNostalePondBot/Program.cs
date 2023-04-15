@@ -253,7 +253,6 @@ class Program
                 }
             }
         }
-        Console.WriteLine(theSame);
         return theSame;
     }
 
@@ -294,7 +293,6 @@ class Program
 
             // Find the smaller image within the larger image
             matches = templateMatching.ProcessImage(grayLarge, graySmall);
-
 
             if (matches.Length > 0)
             {
