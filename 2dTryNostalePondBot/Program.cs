@@ -25,8 +25,8 @@ class Program
     [DllImport("user32.dll")]
     static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
 
-    [DllImport("user32.dll")]
-    static extern bool GetCursorPos(out POINT lpPoint);
+    /*[DllImport("user32.dll")]
+    static extern bool GetCursorPos(out POINT lpPoint);*/
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetWindowDC(IntPtr hwnd);
@@ -53,11 +53,14 @@ class Program
         bool playing = false;
         int coupons = 0;
         int points = 0;
+        int pointsPrice = 0;
 
         while (test)
         {
             Console.Write("How much points: ");
             points = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Input the points price: ");
+            pointsPrice = Convert.ToInt32(Console.ReadLine());
             Console.Write("How many coupons: ");
             coupons = Convert.ToInt32(Console.ReadLine());
             if (coupons >= 0 && points % 100 == 0)
@@ -120,8 +123,8 @@ class Program
                     Click(hwnd, 641, 464);
                     Thread.Sleep(1000);
                     Click(hwnd, 646, 464);
-                    points -= 100;
-                    if (points != 0)
+                    points -= pointsPrice;
+                    if (points >= pointsPrice)
                     {
                         Thread.Sleep(1000);
                         Click(hwnd, 452, 491);
@@ -131,7 +134,7 @@ class Program
                     Console.WriteLine("Points: " + points);
                     Console.WriteLine("Coupons: " + coupons);
                 }
-                if (points == 0 && coupons != 0)
+                if (points < pointsPrice && coupons != 0)
                 {
                     Thread.Sleep(1000);
                     SendMessage(hwnd, WM_KEYDOWN, (IntPtr)0x1B, IntPtr.Zero);
@@ -148,7 +151,7 @@ class Program
                     coupons--;
                     playing = false;
                 }
-                if (points == 0 && coupons == 0)
+                if (points < pointsPrice && coupons == 0)
                     break;
                 Thread.Sleep(100);
             }
