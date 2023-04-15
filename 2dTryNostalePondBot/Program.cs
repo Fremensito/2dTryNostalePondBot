@@ -63,7 +63,7 @@ class Program
             pointsPrice = Convert.ToInt32(Console.ReadLine());
             Console.Write("How many coupons: ");
             coupons = Convert.ToInt32(Console.ReadLine());
-            if (coupons >= 0 && points % 100 == 0)
+            if (coupons >= 0 && points >= pointsPrice)
                 test = false;
             else
                 Console.WriteLine("Incorrect input, try agian (only values for lv 5 reward)");
