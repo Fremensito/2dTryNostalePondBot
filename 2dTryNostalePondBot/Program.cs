@@ -4,13 +4,6 @@ using AForge.Imaging;
 using AForge.Imaging.Filters;
 class Program
 {
-    // Import the user32.dll library
-    [DllImport("user32.dll")]
-    static extern bool SetCursorPos(int x, int y);
-
-    [DllImport("user32.dll")]
-    static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
-
     [StructLayout(LayoutKind.Sequential)]
     struct POINT
     {
@@ -195,9 +188,10 @@ class Program
         int captureY = top; // Y coordinate of the capture region
         int captureWidth = width - left; // Width of the capture region
         int captureHeight = height - top; // Height of the capture region
-        bool theSame = true;
+        bool theSame = false;
 
         Bitmap imageReference = new Bitmap(reference);
+        TemplateMatch[] matches;
 
         using (Graphics windowGraphics = Graphics.FromHwnd(hwnd))
         {
@@ -220,21 +214,19 @@ class Program
             /*string fileName = "screenshot.png"; // File name of the screenshot
             bitmap.Save(fileName, ImageFormat.Png);
             Console.WriteLine("Screenshot saved as: " + fileName);*/
+            Grayscale grayFilter = new Grayscale(0.2125, 0.7154, 0.0721);
+            Bitmap grayLarge = grayFilter.Apply(bitmap);
+            Bitmap graySmall = grayFilter.Apply(imageReference);
 
-            for (int x = 0; x < bitmap.Width; x++)
-            {
-                for (int y = 0; y < bitmap.Height; y++)
-                {
-                    Color pixel1 = bitmap.GetPixel(x, y);
-                    Color pixel2 = imageReference.GetPixel(x, y);
+            // Instantiate the template matching class
+            ExhaustiveTemplateMatching templateMatching = new ExhaustiveTemplateMatching(0.999f);
 
-                    if (pixel1 != pixel2)
-                    {
-                        theSame = false;
-                    }
-                }
+            // Find the smaller image within the larger image
+            matches = templateMatching.ProcessImage(grayLarge, graySmall);
 
-            }
+            if (matches.Length > 0)
+                theSame = true;
+
             if (theSame && direction != "void")
             {
                 if (theSame)
@@ -261,6 +253,7 @@ class Program
                 }
             }
         }
+        Console.WriteLine(theSame);
         return theSame;
     }
 
